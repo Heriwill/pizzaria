@@ -37,10 +37,7 @@ public class Produto {
         private boolean codStatus;
 
         private String mensagemErro = "";
-        private boolean isValid  = true;
-
-        public Produto() {
-        }
+        private boolean isValid  = true
 
         public void setId(Long id){ //void = "mudo", o método não tem retorno
                 this.id = id; //this é referencia do atributo da classe id; separa o atributo da variavel q tem o mesmo nome
