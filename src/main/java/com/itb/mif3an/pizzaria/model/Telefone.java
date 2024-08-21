@@ -1,14 +1,34 @@
 package com.itb.mif3an.pizzaria.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "telefones")
 public class Telefone {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 15)
     private String numero; //pode-se colocar traços, pontos etc
-    private int idCliente;
+
+    //relacionando tabelas muitos para um...
+    @ManyToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
+    private Usuario usuario;
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
     //Atributos de apoio
-
+    @Transient
     private String mensagemErro = "";
+    @Transient
     private boolean isValid  = true;
 
     public Long getId() {
@@ -25,14 +45,6 @@ public class Telefone {
 
     public void setNumero(String numero) {
         this.numero = numero;
-    }
-
-    public int getIdCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
     }
 
     public String getMensagemErro() {

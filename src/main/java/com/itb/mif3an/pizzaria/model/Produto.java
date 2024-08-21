@@ -1,6 +1,14 @@
 package com.itb.mif3an.pizzaria.model;
 
-import javax.swing.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name = "produtos")
 public class Produto {
 
 
@@ -20,24 +28,44 @@ public class Produto {
         // é criar os métodos SETTER'S E GETTER'S
         //SET -> atribuir a informação
         //GET -> recuperar a informação
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
+        @Column(nullable = false, length = 100)
         private String nome;
 
+        @Column(nullable = true, length = 45)
         private String tipo;
-
+        @Column(nullable = true, length = 250)
         private String descricao;
 
+        @Column(nullable = true, columnDefinition = "DECIMAL(5,2)")
         private double precoVenda;
 
+        @Column(nullable = true, columnDefinition = "DECIMAL(5,2)")
         private double precoCompra;
-
+        @Column(nullable = true)
         private int quantidadeEstoque;
 
         private boolean codStatus;
 
+        //FK
+        //@ManyToOne é muitos para um
+        @ManyToOne (cascade = CascadeType.ALL)
+        @JoinColumn(name = "categoria_id", referencedColumnName = "id", nullable = false)
+        private Categoria categoria;
+
+        @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)//cascade é uma reação em cadeia, ao fazer uma acao reflete em todos os produtos
+        @JsonIgnore
+        //não permite fazer um looping infinito, pois a categoria puxa o produto e o produto a categoria... entao o ciclo se repete
+        private List<ItemPedido> itemPedidos = new ArrayList<ItemPedido>();
+
         //Atributos de apoio:
+        @Transient
         private String mensagemErro = "";
+        @Transient
         private boolean isValid  = true;
 
         public void setId(Long id){ //void = "mudo", o método não tem retorno
@@ -69,6 +97,14 @@ public class Produto {
                 return descricao;
         }
 
+        public Categoria getCategoria() {
+                return categoria;
+        }
+
+        public void setCategoria(Categoria categoria) {
+                this.categoria = categoria;
+        }
+
         public void setDescricao(String descricao) {
                 this.descricao = descricao;
         }
@@ -84,6 +120,8 @@ public class Produto {
         public double getPrecoCompra() {
                 return precoCompra;
         }
+
+
 
         public void setPrecoCompra(double precoCompra) {
                 this.precoCompra = precoCompra;
@@ -105,8 +143,31 @@ public class Produto {
                 this.codStatus = codStatus;
         }
 
+        public List<ItemPedido> getItemPedidos() {
+                return itemPedidos;
+        }
+
+        public void setItemPedidos(List<ItemPedido> itemPedidos) {
+                this.itemPedidos = itemPedidos;
+        }
+
+
+
         public String getMensagemErro() {
                 return mensagemErro;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                Produto produto = (Produto) o;
+                return Objects.equals(id, produto.id);
+        }
+
+        @Override
+        public int hashCode() {
+                return Objects.hash(id);
         }
 
         public boolean validarProduto() {
