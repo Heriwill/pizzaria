@@ -8,28 +8,28 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
     private Long id;
     @Column(nullable = false, length = 100)
     private String nome;
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 20)
     private String cpf;
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 45)
     private String username;
     @Column(nullable = false, length = 250)
     private String password;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 45)
     private String tipoUsuario;
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 100)
     private String logradouro;
-    @Column(nullable = false, length = 8)
-    private String cep;
-    @Column(nullable = false, length = 20)
-    private String bairro;
     @Column(nullable = false, length = 15)
+    private String cep;
+    @Column(nullable = false, length = 100)
+    private String bairro;
+    @Column(nullable = false, length = 2)
     private String uf;
     private boolean codStatus;
 
