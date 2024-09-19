@@ -9,32 +9,35 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "categorias")
-
 public class Categoria {
 
-    @Id //PK chave primaria
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //criação automatica das pk
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //nullable nao aceita nulo (not null) e true aceita
-    // length tamanho
+
+   // nullable = false -> não permite valor null (NOT NULL)
+    // lenfth -> tamanho "capacidade máxima"
     @Column(nullable = false, length = 45)
     private String nome;
+
     @Column(nullable = true, length = 100)
     private String descricao;
     private boolean codStatus;
 
-    //FK
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)//cascade é uma reação em cadeia, ao fazer uma acao reflete em todos os produtos
-    @JsonIgnore //não permite fazer um looping infinito, pois a categoria puxa o produto e o produto a categoria... entao o ciclo se repete
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Produto> produtos = new ArrayList<Produto>();
 
-    //Atributos de apoio
-    //@Transient representa um atributo que NAO CORRESPONDE A UMA COLUNA DA TABELA, "É IGNORADO"
+    // Atributos de apoio
+
+    // @Transient -> representa um atributo que NÃO CORRESPONDE A UMA COLUNA DA TABELA
+
     @Transient
+    @JsonIgnore
     private String mensagemErro = "";
     @Transient
-    private boolean isValid  = true;
-
+    @JsonIgnore
+    private boolean isValid = true;
 
     public Long getId() {
         return id;
@@ -76,9 +79,7 @@ public class Categoria {
         this.produtos = produtos;
     }
 
-
-
-    public String getMensagemErro(){
+    public String getMensagemErro() {
         return mensagemErro;
     }
 
@@ -95,11 +96,12 @@ public class Categoria {
         return Objects.hash(id);
     }
 
-    public boolean validarCategoria(){
-        if (nome == null || nome.isEmpty()){
-            mensagemErro += "O nome da categoria é obrigatório: ";
+    public boolean validarCategoria() {
+        if(nome == null || nome.isEmpty()){
+            mensagemErro += "O nome da categoria é obrigatório:";
             isValid = false;
         }
         return isValid;
     }
+
 }

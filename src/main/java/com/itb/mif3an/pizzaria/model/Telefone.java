@@ -1,6 +1,10 @@
 package com.itb.mif3an.pizzaria.model;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "telefones")
@@ -9,27 +13,24 @@ public class Telefone {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 15)
-    private String numero; //pode-se colocar traços, pontos etc
 
-    //relacionando tabelas muitos para um...
+    @Column(nullable = false, length = 15)
+    private String numero;
+    private boolean codStatus;
+
+
     @ManyToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
     private Usuario usuario;
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+    // Atributos de apoio
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    //Atributos de apoio
     @Transient
+    @JsonIgnore
     private String mensagemErro = "";
     @Transient
-    private boolean isValid  = true;
+    @JsonIgnore
+    private boolean isValid = true;
 
     public Long getId() {
         return id;
@@ -47,11 +48,41 @@ public class Telefone {
         this.numero = numero;
     }
 
+    public boolean isCodStatus() {
+        return codStatus;
+    }
+
+    public void setCodStatus(boolean codStatus) {
+        this.codStatus = codStatus;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     public String getMensagemErro() {
         return mensagemErro;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Telefone telefone = (Telefone) o;
+        return Objects.equals(id, telefone.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     public boolean validarTelefone() {
+
         return isValid;
     }
 }

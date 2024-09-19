@@ -1,5 +1,8 @@
 package com.itb.mif3an.pizzaria.model;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -7,15 +10,14 @@ import java.util.Objects;
 @Table(name = "itens_pedido")
 public class ItemPedido {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(nullable = false)
-    private int quantidadeItem;
-    @Column(nullable = false, columnDefinition = "DECIMAL(5,2)")
-    private double precoUnitario;
-
-    private boolean codStatus;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long id;
+   @Column(nullable = false)
+   private int quantidadeItem;
+   @Column(nullable = false, columnDefinition = "DECIMAL(5,2)")
+   private double precoUnitario;
+   private boolean codStatus;
 
     @ManyToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "pedido_id", referencedColumnName = "id", nullable = false)
@@ -25,12 +27,14 @@ public class ItemPedido {
     @JoinColumn(name = "produto_id", referencedColumnName = "id", nullable = false)
     private Produto produto;
 
+    // Atributos de apoio
 
-    //Atributos de apoio
     @Transient
+    @JsonIgnore
     private String mensagemErro = "";
     @Transient
-    private boolean isValid  = true;
+    @JsonIgnore
+    private boolean isValid = true;
 
     public Long getId() {
         return id;
@@ -62,8 +66,8 @@ public class ItemPedido {
 
     public void setCodStatus(boolean codStatus) {
         this.codStatus = codStatus;
-
     }
+
     public Pedido getPedido() {
         return pedido;
     }
@@ -71,7 +75,6 @@ public class ItemPedido {
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
-
 
     public Produto getProduto() {
         return produto;
@@ -99,6 +102,7 @@ public class ItemPedido {
     }
 
     public boolean validarItemPedido() {
+
         return isValid;
     }
 }

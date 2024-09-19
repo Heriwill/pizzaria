@@ -1,9 +1,11 @@
 package com.itb.mif3an.pizzaria.model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,10 +14,11 @@ import java.util.Objects;
 public class Usuario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String nome;
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private String cpf;
     @Column(nullable = false, length = 45)
     private String username;
@@ -23,51 +26,41 @@ public class Usuario {
     private String password;
     @Column(nullable = false, length = 45)
     private String tipoUsuario;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String logradouro;
-    @Column(nullable = false, length = 15)
+    @Column(nullable = true, length = 15)
     private String cep;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String bairro;
-    @Column(nullable = false, length = 2)
+    @Column(nullable = true, length = 2)
     private String uf;
+    @Column(nullable = false)
     private boolean codStatus;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)//cascade é uma reação em cadeia, ao fazer uma acao reflete em todos os produtos
-    @JsonIgnore //não permite fazer um looping infinito, pois a categoria puxa o produto e o produto a categoria... entao o ciclo se repete
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Telefone> telefones = new ArrayList<Telefone>();
-    //não permite fazer um looping infinito, pois a categoria puxa o produto e o produto a categoria... entao o ciclo se repete
 
+    // EAGER refere-se ao tipo da consulta: "Imediato"
+    //LEZY refere ao tipo da consulta: "Preguiçoso"
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) // CascateType é ação em cascata, propaga para todos os atributos //EAGER é imediato, traz tudo; o LAZY não, traz só o necessário
+    @JoinTable(name = "usuarios_papeis",
+    joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "papel_id", referencedColumnName = "id")
+    )
+    private Collection<Papel> papeis;
 
-    //Atributos de apoio
+    // Atributos de apoio
 
     @Transient
+    @JsonIgnore
     private String mensagemErro = "";
     @Transient
-    private boolean isValid  = true;
+    @JsonIgnore
+    private boolean isValid = true;
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
     }
 
     public String getUsername() {
@@ -134,6 +127,25 @@ public class Usuario {
         this.codStatus = codStatus;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 
     public List<Telefone> getTelefones() {
         return telefones;
@@ -141,6 +153,14 @@ public class Usuario {
 
     public void setTelefones(List<Telefone> telefones) {
         this.telefones = telefones;
+    }
+
+    public Collection<Papel> getPapeis() {
+        return papeis;
+    }
+
+    public void setPapeis(Collection<Papel> papeis) {
+        this.papeis = papeis;
     }
 
     public String getMensagemErro() {
@@ -152,7 +172,7 @@ public class Usuario {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
-        return Objects.equals(id, usuario.id);
+        return isValid == usuario.isValid && Objects.equals(id, usuario.id);
     }
 
     @Override
@@ -161,6 +181,7 @@ public class Usuario {
     }
 
     public boolean validarUsuario() {
+
         return isValid;
     }
 }
