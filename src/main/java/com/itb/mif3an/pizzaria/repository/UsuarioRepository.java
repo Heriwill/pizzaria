@@ -12,4 +12,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query(value = "SELECT * FROM usuarios u WHERE u.username=?", nativeQuery = true) // a ? é uma variavel,  neste contexto ela ainda não é definida pois n sabemos o email etc.
     Usuario findByEmail(String email);
 
+    Usuario findByUsername(String username);
 }
