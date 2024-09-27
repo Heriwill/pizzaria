@@ -29,6 +29,7 @@ categoria_id BIGINT NOT NULL,
 CONSTRAINT fk_produtos_categoria_id FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 )
 
+-- noinspection SqlDialectInspection
 CREATE TABLE usuarios (
 id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 nome VARCHAR(100) NULL,
@@ -36,6 +37,10 @@ cpf VARCHAR(20) NULL,
 username VARCHAR(45) NOT NULL UNIQUE,
 password VARCHAR(250) NOT NULL,
 tipo_usuario VARCHAR(45) NOT NULL,
+cargo VARCHAR(45) NULL,
+matricula_funcional VARCHAR(15) NULL,
+matricula_admin VARCHAR(15) NULL,
+pontuacao int NULL,
 logradouro VARCHAR(100) NULL,
 cep VARCHAR(15) NULL,
 bairro VARCHAR(100) NULL,
@@ -74,7 +79,7 @@ CONSTRAINT fk_itens_pedido_pedido_id FOREIGN KEY (pedido_id) REFERENCES pedidos(
 CONSTRAINT fk_itens_pedido_produto_id FOREIGN KEY (produto_id) REFERENCES produtos(id)
 )
 
---Recursos necessários para o sistema de login
+--Recursos necessï¿½rios para o sistema de login
 CREATE TABLE papeis (
 id BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 nome_papel VARCHAR(45) NOT NULL,

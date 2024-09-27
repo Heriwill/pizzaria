@@ -9,6 +9,6 @@ public interface UsuarioService {
     public Usuario findByUsername(String username);
 
     public Papel savePapel(Papel papel);
-    void addPapelToUsuario(Usuario usuario, String nomePapel);
+    public void addPapelToUsuario(Usuario usuario, String nomePapel);
 
 }
