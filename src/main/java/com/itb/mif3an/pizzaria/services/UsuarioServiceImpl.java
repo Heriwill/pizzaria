@@ -2,14 +2,15 @@ package com.itb.mif3an.pizzaria.services;
 
 
 import com.itb.mif3an.pizzaria.exceptions.BadRequest;
-import com.itb.mif3an.pizzaria.model.Papel;
-import com.itb.mif3an.pizzaria.model.Usuario;
+import com.itb.mif3an.pizzaria.model.*;
 import com.itb.mif3an.pizzaria.repository.PapelRepository;
 import com.itb.mif3an.pizzaria.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,9 +22,13 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     private final UsuarioRepository usuarioRepository;
     private final PapelRepository papelRepository; //injeção de independencia
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PapelRepository papelRepository, PapelRepository papelRepository1) {
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PapelRepository papelRepository) {
         this.usuarioRepository = usuarioRepository;
         this.papelRepository = papelRepository;
+
     }
 
     @Override
@@ -45,6 +50,51 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     public void addPapelToUsuario(Usuario usuario, String nomePapel) {
         Papel papel = papelRepository.findByNomePapel(nomePapel);
         usuario.getPapeis().add(papel);
+    }
+
+    @Override
+    public Usuario saveFuncionario(Funcionario funcionario) {
+        if (!funcionario.validarUsuario()){
+            throw new BadRequest(funcionario.getMensagemErro());
+        }
+       Usuario usuario = usuarioRepository.findByUsername(funcionario.getUsername());
+       if(usuario != null) {
+           throw new BadRequest("Email já existente no banco de dados");
+       }
+       funcionario.setPassword(passwordEncoder.encode(funcionario.getPassword()));
+       funcionario.setPapeis(new ArrayList<>());
+       addPapelToUsuario(funcionario, "ROLE_FUNCIONARIO");
+       return usuarioRepository.save(funcionario);
+    }
+
+    @Override
+    public Usuario saveCliente(Cliente cliente) {
+        if (!cliente.validarUsuario()){
+           throw new BadRequest(cliente.getMensagemErro());
+        }
+        Usuario usuario = usuarioRepository.findByUsername(cliente.getUsername());
+        if (cliente != null){
+            throw new BadRequest("Email já existente no banco de dados");
+        }
+        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
+        cliente.setPapeis(new ArrayList<>());
+        addPapelToUsuario(cliente, "ROLE_CLIENTE");
+        return usuarioRepository.save(cliente);
+    }
+
+    @Override
+    public Usuario saveAdmin(Admin admin) {
+        if (!admin.validarUsuario()){
+            throw new BadRequest(admin.getMensagemErro());
+        }
+        Usuario usuario = usuarioRepository.findByUsername(admin.getUsername());
+        if(usuario != null) {
+            throw new BadRequest("Email já existente no banco de dados");
+        }
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        admin.setPapeis(new ArrayList<>());
+        addPapelToUsuario(admin, "ROLE_ADMIN");
+        return usuarioRepository.save(admin);
     }
 
     @Override
